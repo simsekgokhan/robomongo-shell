@@ -392,6 +392,21 @@ if not has_option('noshell') and usemozjs:
                  "$BUILD_DIR/mongo/util/password",
                  ])
 
+    # [START] Robomongo shell library
+    robo_shell = shellEnv.MergeLibrary("roboshell", [
+        "$BUILD_DIR/third_party/shim_pcrecpp",
+        "shell_options",
+        "shell_core",
+        "db/server_options_core",
+        "client/clientdriver",
+        "$BUILD_DIR/mongo/util/password",
+    ])
+
+    # Run this target as:
+    # $ scons roboshell -j4
+    shellEnv.Alias("roboshell", robo_shell)
+    # [END] Robomongo shell library
+
     shellEnv.Install( '#/', mongo_shell )
 else:
     shellEnv = None

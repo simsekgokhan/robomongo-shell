@@ -1,3 +1,26 @@
+Robomongo README
+
+One target is added: "roboshell" static library. Build it in the following way:
+
+Debug:
+  $ scons roboshell -j4 --dbg --link-mode=static
+
+Release:
+  $ scons roboshell -j4 --release --link-mode=static
+
+Option '--link-mode=static' is required to produce self-contained library that 
+can be distributed. For more information, check:
+  1) SConstruct  (search for 'link-mode' and 'link_mode')
+  2) site_scons/site_tools/mergelib.py (implementation of MergeLibrary)
+
+Both debug (--dbg) and release (--release) modes are working 
+on Linux.
+
+For now it is tested only on Linux.
+
+
+------------------------------------------------------------------------------
+
 MongoDB README
 
 Welcome to MongoDB!
