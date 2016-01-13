@@ -465,7 +465,10 @@ shellPrintHelper = function (x) {
     if (typeof p == "function")
         print(x.tojson());
     else
-        print(tojson(x));
+        // Robomongo.
+        // Do not convert to JSON
+        print(x);
+        //print(tojson(x));
 }
 
 shellAutocomplete = function ( /*prefix*/ ) { // outer scope function called on init. Actual function at end

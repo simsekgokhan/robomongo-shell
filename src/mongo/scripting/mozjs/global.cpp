@@ -39,6 +39,13 @@
 #include "mongo/scripting/mozjs/objectwrapper.h"
 #include "mongo/scripting/mozjs/valuereader.h"
 
+//#ifdef ROBOMONGO
+#include "mongo/scripting/mozjs/valuewriter.h"
+extern std::vector<mongo::BSONObj> __objects;
+extern std::stringstream __logs;
+extern void robomongo_add_bsonobj(const mongo::BSONObj &obj);
+//#endif
+
 namespace mongo {
 namespace mozjs {
 
@@ -59,25 +66,31 @@ logger::MessageLogDomain* jsPrintLogDomain;
 
 void GlobalInfo::Functions::print::call(JSContext* cx, JS::CallArgs args) {
     logger::LogstreamBuilder builder(jsPrintLogDomain, getThreadName(), logger::LogSeverity::Log());
-    std::ostream& ss = builder.stream();
+//    std::ostream& ss = builder.stream();
 
     bool first = true;
     for (size_t i = 0; i < args.length(); i++) {
         if (first)
             first = false;
         else
-            ss << " ";
+            __logs << " ";
 
         if (args.get(i).isNullOrUndefined()) {
             // failed to get object to convert
-            ss << "[unknown type]";
+            __logs << "[unknown type]";
             continue;
         }
 
-        JSStringWrapper jsstr(cx, JS::ToString(cx, args.get(i)));
-        ss << jsstr.toStringData();
+        auto writer = ValueWriter(cx, args.get(i));
+        if (writer.type() == Object) {
+            BSONObj obj = ValueWriter(cx, args.get(i)).toBSON();
+            robomongo_add_bsonobj(obj);
+        } else {
+            JSStringWrapper jsstr(cx, JS::ToString(cx, args.get(i)));
+            __logs << jsstr.toStringData();
+        }
     }
-    ss << std::endl;
+    __logs << std::endl;
 
     args.rval().setUndefined();
 }
