@@ -10,4 +10,4 @@ if [ "$(uname -s)" == "Darwin" ]; then
 fi
 
 cd $PROJECT_DIR
-scons -j8 --release $MAC_SDK
+scons mongo -j8 --release $MAC_SDK
