@@ -82,8 +82,15 @@ void GlobalInfo::Functions::print::call(JSContext* cx, JS::CallArgs args) {
         }
 
         auto writer = ValueWriter(cx, args.get(i));
-        if (writer.type() == Object) {
+        if (writer.type() == Object || writer.type() == Array) {
             BSONObj obj = ValueWriter(cx, args.get(i)).toBSON();
+
+            if (writer.type() == Array) {
+                // This method on BSONObj is an extension for
+                // Robomongo Shell and not part of original MongoDB sources
+                obj.markAsArray();
+            }
+
             robomongo_add_bsonobj(obj);
         } else {
             JSStringWrapper jsstr(cx, JS::ToString(cx, args.get(i)));
