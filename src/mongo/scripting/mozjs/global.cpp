@@ -66,38 +66,55 @@ logger::MessageLogDomain* jsPrintLogDomain;
 
 void GlobalInfo::Functions::print::call(JSContext* cx, JS::CallArgs args) {
     logger::LogstreamBuilder builder(jsPrintLogDomain, getThreadName(), logger::LogSeverity::Log());
-//    std::ostream& ss = builder.stream();
+
+    std::stringstream& ss = __logs;
 
     bool first = true;
     for (size_t i = 0; i < args.length(); i++) {
         if (first)
             first = false;
         else
-            __logs << " ";
+            ss << " ";
 
         if (args.get(i).isNullOrUndefined()) {
             // failed to get object to convert
-            __logs << "[unknown type]";
+            ss << "[unknown type]";
             continue;
         }
 
-        auto writer = ValueWriter(cx, args.get(i));
-        if (writer.type() == Object || writer.type() == Array) {
-            BSONObj obj = ValueWriter(cx, args.get(i)).toBSON();
+        JS::HandleValue value = args.get(i);
+        ValueWriter writer = ValueWriter(cx, value);
+        int valueType = writer.type();
 
-            if (writer.type() == Array) {
-                // This method on BSONObj is an extension for
-                // Robomongo Shell and not part of original MongoDB sources
-                obj.markAsArray();
+        // Handle objects and arrays specially
+        if (valueType == Object || valueType == Array) {
+            JS::RootedObject jsObj(cx, value.toObjectOrNull());
+            auto jsClass = JS_GetClass(jsObj);
+
+            // Check that this is not an Error object
+            if (strcmp(jsClass->name, "Error") != 0) {
+
+                // Convert to bson
+                BSONObj obj = ValueWriter(cx, value).toBSON();
+
+                // Handle arrays specially
+                if (writer.type() == Array) {
+                    // This method on BSONObj is an extension for
+                    // Robomongo Shell and not part of original MongoDB sources
+                    obj.markAsArray();
+                }
+
+                robomongo_add_bsonobj(obj);
+                continue;
             }
-
-            robomongo_add_bsonobj(obj);
-        } else {
-            JSStringWrapper jsstr(cx, JS::ToString(cx, args.get(i)));
-            __logs << jsstr.toStringData();
         }
+
+        // Because this is not a value that we can handle specially,
+        // convert it to a string (it actually calls "toString")
+        JSStringWrapper jsstr(cx, JS::ToString(cx, value));
+        ss << jsstr.toStringData();
     }
-    __logs << std::endl;
+    ss << std::endl;
 
     args.rval().setUndefined();
 }
