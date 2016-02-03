@@ -6,7 +6,7 @@ PROJECT_DIR=$(dirname $BIN_DIR)                                   # Get root dir
 
 if [ "$(uname -s)" == "Darwin" ]; then
     # On Mac OS we specify minimal OS version that we support.
-    MAC_SDK="--osx-version-min=10.9"
+    MAC_SDK="--osx-version-min=10.7"
 fi
 
 cd $PROJECT_DIR
