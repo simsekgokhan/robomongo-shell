@@ -1,4 +1,4 @@
-@echo off 
+@echo off
 setlocal enableextensions enabledelayedexpansion
 
 rem -----------------------------------
@@ -17,4 +17,4 @@ rem -----------------------------------
 cd "%PROJECT_DIR%
 
 rem Build mongo shell in release mode
-scons mongo.exe -j8 --release --dynamic-windows
+scons mongo.exe -j8 --release --dynamic-windows %*
