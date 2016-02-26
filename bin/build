@@ -2,12 +2,7 @@
 
 BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"       # Get directory of this file
 PROJECT_DIR=$(dirname $BIN_DIR)                                   # Get root directory of project
-
-
-if [ "$(uname -s)" == "Darwin" ]; then
-    # On Mac OS we specify minimal OS version that we support.
-    MAC_SDK="--osx-version-min=10.9"
-fi
+source $BIN_DIR/common/setup $1
 
 cd $PROJECT_DIR
-scons mongo -j8 --release $MAC_SDK "$@"
+scons mongo -j8 $BUILD_TYPE_SWITCH $MAC_SDK_SWITCH "${@:2}"
