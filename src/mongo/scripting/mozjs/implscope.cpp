@@ -48,6 +48,10 @@
 #include "mongo/util/log.h"
 #include "mongo/util/scopeguard.h"
 
+//#ifdef ROBOMONGO
+extern std::stringstream __logs;
+//#endif
+
 using namespace mongoutils;
 
 namespace mongo {
@@ -124,6 +128,9 @@ void MozJSImplScope::_reportError(JSContext* cx, const char* message, JSErrorRep
                 ss << " :\n" << str;
             }
         }
+
+        // There is an operator "std::string" defined on "std::stream"
+        __logs << (std::string) ss;
 
         scope->_status = Status(
             JSErrorReportToStatus(cx, report, ErrorCodes::JSInterpreterFailure, message).code(),

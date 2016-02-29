@@ -66,7 +66,7 @@ logger::MessageLogDomain* jsPrintLogDomain;
 
 void GlobalInfo::Functions::print::call(JSContext* cx, JS::CallArgs args) {
     logger::LogstreamBuilder builder(jsPrintLogDomain, getThreadName(), logger::LogSeverity::Log());
-
+//    std::ostream& ss = builder.stream();
     std::stringstream& ss = __logs;
 
     bool first = true;
