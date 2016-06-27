@@ -2402,7 +2402,7 @@ def doConfigure(myenv):
                 #include <openssl/evp.h>
             """):
             # Unsetting FIPS mode, currently OpenSSL is built without FIPS option
-			conf.env.SetConfigHeaderDefine('MONGO_CONFIG_HAVE_FIPS_MODE_UNSET')
+            conf.env.SetConfigHeaderDefine('MONGO_CONFIG_HAVE_FIPS_MODE_UNSET')
 
     return conf.Finish()
 
